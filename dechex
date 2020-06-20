@@ -1,0 +1,43 @@
+#!/bin/bash
+source ${HOME}/bash.scripts/colors
+regHEX='^[a-fA-F0-9]+$'
+regINT='^[[:digit:]]+$'
+cmdname="$(echo "$0" | awk -F '/' '{print $5}')"
+error() {
+	printf "${c_lred}The input string ('${c_normal}%s${c_lred}') is not an HEX or DEC number.${c_normal}\n" $inp
+	exit 0
+}
+if [ $# -eq 0 ]; then
+	printf "Aufruf: ${c_warning}%s${c_normal} [HEX/Dezimal-Zahl] <Umwandlungsrichtung>\n\nWandelt Hexadezimal/- in Dezimal/- oder Dezimal/- in Hexadezimal/-zahlen um\n\n${c_warning}Parameter:${c_normal} [HEX/Dezimal-Zahl]:\n\tz.B.: \"ff\" oder \"255\"\n${c_warning}Parameter:${c_normal} <Umwandlungsrichtung>:\n\t\"h\": Convertiere von Dezimal in Hexadezimal\n\t\"d\": Convertiere von hexadezimal in Dezimal\n\tLEER: Autoerkennung\n\n${c_warning}Beispiele:${c_normal}\n\t\$ dechex ff\n\tInp: FF\n\tDec: 255\n\n\t\$ dechex 255\n\tInp: 255\n\tHex: FF\n\n${c_lblue}Programmiert von Rene Hoffmann [GitHUB: yorha93]\n${c_normal}"  "$cmdname"
+elif [ $# -gt 0 ]; then
+	inp=$1
+	[[ ! -z $2 ]] && dir=$2;
+	
+	if [[ -z $dir ]]; then
+		if  [[ $inp =~ $regINT ]]; then
+			printf "${c_green}Inp: %d${c_warning}\nHex: %X\n" "$inp" "$inp"
+			exit 1
+		elif  [[ $inp =~ $regHEX ]]; then
+			printf "${c_warning}Inp: %X${c_green}\nDec: %u\n" "0x$inp" "0x$inp"
+			exit 1
+		else
+			error
+		fi
+	elif [[ $dir == "h" ]]; then
+		if [[ $inp =~ $regINT ]]; then
+			printf "${c_green}Inp: %d${c_warning}\nHex: %X\n" "$inp" "$inp"
+			exit 1
+		else
+			error
+		fi	
+	elif [[ $dir == "d" ]]; then
+		if [[ $inp =~ $regHEX ]]; then
+			printf "${c_warning}Inp: %X${c_green}\nDec: %u\n" "0x$inp" "0x$inp"
+			exit 1
+		else
+			error			
+		fi
+	elif [[ $dir != "dec" || $dir != "hex" ]]; then
+		printf "${c_lred}The last parameter have to be 'h' or 'd'${c_normal}\n"
+	fi
+fi
